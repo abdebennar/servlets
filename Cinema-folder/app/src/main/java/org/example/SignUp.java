@@ -3,10 +3,12 @@ package org.example;
 import java.io.IOException;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+@WebServlet
 public class SignUp extends HttpServlet {
 
     @Override
@@ -17,6 +19,8 @@ public class SignUp extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        // TODO: Server that as a static HTML file instead of hardcoding it here
         response.setContentType("text/html");
         response.getWriter().println("""
 			 <html>
@@ -46,18 +50,18 @@ public class SignUp extends HttpServlet {
 
             // TODO: Add user registration logic here (e.g., save to database)
             Database db = new Database();
-
             db.RegisterUser(firstName, lastName, phone, password);
 
             response.setStatus(HttpServletResponse.SC_OK);
-        } catch (Exception e) {
-            e.printStackTrace();
+            response.getWriter().println("<html><body><h2>Registration Seccuss</h2></body></html>");
+            response.sendRedirect("/signIn");
+
+        } catch (Throwable e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().println("<html><body><h2>Registration Failed!</h2></body></html>");
         }
     }
 
-    1
     @Override
     public void destroy() {
         System.out.println("SignUp destroyed!");

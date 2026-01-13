@@ -22,6 +22,7 @@ public class App {
         // Register your servlets (routes)
         context.addServlet(new ServletHolder(new SignUp()), "/signUp");
         context.addServlet(new ServletHolder(new SignIn()), "/signIn");
+        context.addServlet(new ServletHolder(new Profile()), "/profile");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
