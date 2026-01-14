@@ -1,4 +1,4 @@
-package org.example;
+package org.cinema;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.annotation.WebFilter;
@@ -6,13 +6,19 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebFilter("/profile/*")
-public class ProFileFilter implements Filter {
+@WebFilter(value = "/profile/*")
+public class ProfileFilter implements Filter {
 
+    // protected Database database;
+    // protected ApplicationContext springContext;
     @Override
     public void init(jakarta.servlet.FilterConfig filterConfig)
             throws jakarta.servlet.ServletException {
+
+        // springContext = (ApplicationContext) filterConfig.getServletContext().getAttribute("springContext");
+        // database = springContext.getBean(Database.class);
         System.out.println("Profile Filter initialized!");
+
     }
 
     @Override
@@ -22,13 +28,15 @@ public class ProFileFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         try {
-            // log 
-            System.out.println("##################### Profile doFilter called ###################");
 
-            String sessionId = this.getCookieValue(httpRequest, "sessionId");
+            System.out.println("Profile Filter checking authentication...");
 
-            Database db = new Database();
-            if (db.isAuthenticated(sessionId)) {
+            String sessionId = this.getCookieValue(httpRequest, "jwt");
+
+            String userId = JwtUtil.validateTokenAndGetUserId(sessionId);
+            if (userId != null) {
+
+                request.setAttribute("userID", userId);
                 chain.doFilter(request, response);
             } else {
                 httpResponse.sendRedirect("/signIn");

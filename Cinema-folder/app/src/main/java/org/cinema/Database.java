@@ -1,4 +1,4 @@
-package org.example;
+package org.cinema;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -35,14 +35,15 @@ public class Database {
     }
 
     public String AuthenticateUser(String phone, String password) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM servlets.users WHERE phone = ? AND password = ?";
+        String sql = "SELECT id FROM servlets.users WHERE phone = ? AND password = ? LIMIT 1";
         try (Connection conn = getConnection(); var pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, phone);
             pstmt.setString(2, password);
             try (var rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    // TODO: change this to Jwt or Cookies based session management
-                    return "user_session_" + rs.getInt(1);
+                    String userId = rs.getString("id");
+                    // Generate and return JWT token
+                    return JwtUtil.generateToken(userId);
                 } else {
                     return null;
                 }
@@ -50,27 +51,23 @@ public class Database {
         }
     }
 
-    public boolean isAuthenticated(String sessionId) {
-
-        String sql = "SELECT COUNT(*) FROM servlets.sessions WHERE session_id = ?";
+    public String[] getNames(String userID) {
+        String sql = "SELECT first_name, last_name FROM servlets.users WHERE id = CAST(? AS INTEGER) LIMIT 1";
         try (Connection conn = getConnection(); var pstmt = conn.prepareStatement(sql)) {
-            // return "user_session_" + rs.getInt(1);
-
-            String phoneFromSessionId = sessionId.replace("user_session_", "");
-            pstmt.setString(1, phoneFromSessionId);
-
+            pstmt.setString(1, userID);
             try (var rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    int count = rs.getInt(1);
-                    return count > 0;
+                    String firstName = rs.getString("first_name");
+                    String lastName = rs.getString("last_name");
+                    return new String[]{firstName, lastName};
                 } else {
-                    return false;
+                    return null;
                 }
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
+
 }

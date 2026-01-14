@@ -1,25 +1,29 @@
-package org.example;
+package org.cinema;
 
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.webapp.WebAppContext;
 
 public class App {
 
     public static void main(String[] args) throws Exception {
         System.out.println("Starting server...");
 
-        // Create a server on port 8080
         Server server = new Server(3000);
-
-        // Create a context handler
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        WebAppContext context = new WebAppContext();
         context.setContextPath("/");
+        context.setResourceBase("src/main/webapp");
+        context.setParentLoaderPriority(true);
+
         server.setHandler(context);
 
         context.addEventListener(new AppContextListner());
 
-        // Register your servlets (routes)
+        FilterHolder profileFilterHolder = new FilterHolder(new ProfileFilter());
+        context.addFilter(profileFilterHolder, "/profile", null);
+
+        // servlets (routes)
         context.addServlet(new ServletHolder(new SignUp()), "/signUp");
         context.addServlet(new ServletHolder(new SignIn()), "/signIn");
         context.addServlet(new ServletHolder(new Profile()), "/profile");
@@ -36,7 +40,6 @@ public class App {
 
         // Start the server
         server.start();
-        // server.setStopAtShutdown(true);
 
         System.out.println("Server started on http://localhost:3000");
 

@@ -1,18 +1,17 @@
-package org.example;
+package org.cinema;
 
 import java.io.IOException;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet
-public class SignUp extends HttpServlet {
+public class SignUp extends BaseServlet {
 
     @Override
-    public void init() throws ServletException {
+    public void init() {
         System.out.println("SignUp initialized!");
     }
 
@@ -49,8 +48,7 @@ public class SignUp extends HttpServlet {
             String password = request.getParameter("password");
 
             // TODO: Add user registration logic here (e.g., save to database)
-            Database db = new Database();
-            db.RegisterUser(firstName, lastName, phone, password);
+            database.RegisterUser(firstName, lastName, phone, password);
 
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().println("<html><body><h2>Registration Seccuss</h2></body></html>");

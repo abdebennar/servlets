@@ -1,16 +1,16 @@
-package org.example;
+package org.cinema;
 
 import java.io.IOException;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-public class SignIn extends HttpServlet {
+public class SignIn extends BaseServlet {
 
     @Override
-    public void init() throws ServletException {
+    public void init() {
         System.out.println("SignIn initialized!");
     }
 
@@ -24,9 +24,9 @@ public class SignIn extends HttpServlet {
 			   <body>
 				 <h2>Sign In</h2>
 				 <form method="post" action="/signIn">
-				   Phone: <input phone="phone"><br>
-				   Password: <input type="password" name="password"><br>
-				   <button type="submit">Login</button>
+					Phone: <input name="phone"><br>
+					Password: <input type="password" name="password"><br>
+					<button type="submit">Login</button>
 				 </form>
 			   </body>
 			 </html>
@@ -40,11 +40,24 @@ public class SignIn extends HttpServlet {
             String phone = request.getParameter("phone");
             String password = request.getParameter("password");
 
-            Database db = new Database();
-            String sessionId = db.AuthenticateUser(phone, password);
-            if (sessionId != null) {
+            System.out.println("Authenticating user with phone: " + phone + " and password: " + password);
+            String jwtToken = database.AuthenticateUser(phone, password);
+
+            System.out.println("JWT Token: " + jwtToken);
+
+            if (jwtToken != null) {
+                System.out.println("User authenticated, JWT generated");
+
+                // Create JWT cookie
+                Cookie jwtCookie = new Cookie("jwt", jwtToken);
+                jwtCookie.setHttpOnly(true); // Prevents JavaScript access (XSS protection)
+                jwtCookie.setSecure(false); // Set to true in production with HTTPS
+                jwtCookie.setMaxAge(86400); // 24 hours (matches JWT expiration)
+                jwtCookie.setPath("/"); // Available to entire application
+
+                response.addCookie(jwtCookie);
+
                 response.setStatus(HttpServletResponse.SC_OK);
-                response.getWriter().println("<html><body><h2>Login Successful!</h2></body></html>");
                 response.sendRedirect("/profile");
             } else {
                 throw new Exception("Authentication failed");
