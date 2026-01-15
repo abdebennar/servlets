@@ -11,6 +11,7 @@ public class SignIn extends BaseServlet {
 
     @Override
     public void init() {
+		super.init();
         System.out.println("SignIn initialized!");
     }
 
@@ -43,8 +44,6 @@ public class SignIn extends BaseServlet {
             System.out.println("Authenticating user with phone: " + phone + " and password: " + password);
             String jwtToken = database.AuthenticateUser(phone, password);
 
-            System.out.println("JWT Token: " + jwtToken);
-
             if (jwtToken != null) {
                 System.out.println("User authenticated, JWT generated");
 
@@ -63,7 +62,7 @@ public class SignIn extends BaseServlet {
                 throw new Exception("Authentication failed");
             }
 
-        } catch (Throwable e) {
+        } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().println("<html><body><h2>Login Failed!</h2></body></html>");
         }

@@ -6,12 +6,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import at.favre.lib.crypto.bcrypt.BCrypt;
 
 @WebServlet
 public class SignUp extends BaseServlet {
 
     @Override
     public void init() {
+		super.init();
         System.out.println("SignUp initialized!");
     }
 
@@ -51,10 +53,10 @@ public class SignUp extends BaseServlet {
             database.RegisterUser(firstName, lastName, phone, password);
 
             response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().println("<html><body><h2>Registration Seccuss</h2></body></html>");
             response.sendRedirect("/signIn");
 
-        } catch (Throwable e) {
+        } catch (Exception e) {
+			e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().println("<html><body><h2>Registration Failed!</h2></body></html>");
         }
